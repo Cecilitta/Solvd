@@ -8,7 +8,7 @@ public abstract class Person {
 
     // ----Constructors------
 
-    public Person(String contact, String name)  {
+    public Person(String contact, String name) {
         super();
         this.contact = contact;
         this.name = name;

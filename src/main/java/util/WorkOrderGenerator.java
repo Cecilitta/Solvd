@@ -2,6 +2,7 @@ package util;
 
 import device.Device;
 import device.TypeOfDevice;
+import exception.NoDetailException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 import person.Client;
@@ -69,7 +70,7 @@ public class WorkOrderGenerator {
     }
 
     public ArrayList<WorkOrder> generateWorkOrder(ArrayList<Device> device, ArrayList<Client> client,
-                                                  ArrayList<Technician> technician, ArrayList<Service> service) {
+                                                  ArrayList<Technician> technician, ArrayList<Service> service) throws NoDetailException {
         Random paid = new Random();
         Random delivered = new Random();
         Random workOrderState = new Random();

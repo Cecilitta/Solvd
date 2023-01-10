@@ -21,27 +21,32 @@ public final class Client extends Person {
 
     // -----Constructors-----
 
-    public Client(String contact, String name, boolean vip)  {
+    public Client(String contact, String name, boolean vip) {
         super(contact, name);
         clientCounter++;
         this.vip = vip;
         this.CLIENT_ID = clientCounter;
     }
 
-    public static Client compareClient(String cl) {
+    public static Client compareClient(String cl) throws InvalidContactException {
         if (cl.equals("Y")) {
-            LOGGER.info("Client Info: \n Contact: ");
-            String contact = in.nextLine();
-            LOGGER.info(" Name: ");
+            System.out.println("Client Info: \n Contact: ");
+            String contact;
+            try {
+                contact = in.nextLine();
+            } catch (Exception e) {
+                throw new InvalidContactException("invalid contact");
+            }
+            System.out.println(" Name: ");
             String name = in.nextLine();
-            LOGGER.info("Is vip? (True/False): ");
+            System.out.println("Is vip? (True/False): ");
             boolean vip = Boolean.parseBoolean(in.nextLine());
             Client newClient = new Client(contact, name, vip);
             WorkOrderGenerator.addNewClient(newClient);
-            LOGGER.info(newClient);
+            System.out.println(newClient);
             return newClient;
         } else {
-            LOGGER.info("Enter Client ID: ");
+            System.out.println("Enter Client ID: ");
             int clientId = in.nextInt();
             return clientMap.get(clientId);
         }

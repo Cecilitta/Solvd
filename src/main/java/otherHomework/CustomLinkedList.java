@@ -44,12 +44,14 @@ public class CustomLinkedList<T> {
         return size;
     }
 }
-    class Node<T> {
-        Node<T> next;
-        T value;
-        Node(T value) {
-            this.value = value;
-        }
+
+class Node<T> {
+    Node<T> next;
+    T value;
+
+    Node(T value) {
+        this.value = value;
     }
+}
 
 

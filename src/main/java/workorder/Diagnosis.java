@@ -1,5 +1,7 @@
 package workorder;
 
+import exception.NoDetailException;
+
 import java.util.Objects;
 
 public class Diagnosis {
@@ -9,7 +11,7 @@ public class Diagnosis {
 
     //-------Constructor------
 
-    public Diagnosis(String detail) {
+    public Diagnosis(String detail) throws NoDetailException {
         this.detail = detail;
 
     }

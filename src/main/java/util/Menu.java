@@ -3,6 +3,9 @@ package util;
 import device.Device;
 import device.TypeOfDevice;
 import exception.InvalidContactException;
+import exception.InvalidDeviceException;
+import exception.NoDetailException;
+import exception.NoServiceTypeException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import person.Client;
@@ -27,36 +30,38 @@ public final class Menu implements ISearch {
     public Menu() {
     }
 
-    public void printMenu() {
+    public void printMenu() throws Exception {
         while (closeWhile) {
-            LOGGER.info("Enter an option:\n" +
+
+            System.out.println(("Enter an option:\n" +
                     "        1. New Work Order \n" +
                     "        2. Search Client, Device or Work Order \n" +
                     "        3. Pay Service \n" +
                     "        4. Filter Work Order (state/ paid/ delivered) \n" +
                     "        5. Change Work Order state to done \n" +
-                    "        6. Change Work Order to delivered" +
+                    "        6. Change Work Order to delivered \n" +
                     "        7. Delete Work order\n" +
                     "        8. Quit \n" +
-                    "\n");
+                    "\n"));
 
             String option = in.nextLine();
+
             switch (option) {
 
-                case "1"  -> {
+                case "1" -> {
                     Client newClient = addClient();
                     Device newDevice = createDevice();
                     Diagnosis newDiagnosis = toDiagnosis();
                     Service newService = createService();
                     ServiceType techSpec = newService.getType();
-                    LOGGER.info("Technical Specialist needed (True/False): ");
+                    System.out.println("Technical Specialist needed (True/False): ");
                     boolean specialist = Boolean.parseBoolean(in.nextLine());
                     Technician newTechnician = selectTechnician(techSpec, specialist);
                     BusinessHour dueDate = dueTo();
                     WorkOrder newWorkOrder = new WorkOrder(newClient, newDiagnosis, newTechnician, newService,
                             newDevice, false, false, false, dueDate);
                     float totalPrice = newWorkOrder.calculateFinalPrice();
-                    LOGGER.info(newWorkOrder + "The total price is: $" + totalPrice);
+                    System.out.println(newWorkOrder + "The total price is: $" + totalPrice);
                 }
 
                 case "2" -> search();
@@ -64,33 +69,33 @@ public final class Menu implements ISearch {
                 case "3" -> filterWorkOrder();
 
                 case "4" -> {
-                    LOGGER.info("Enter the Work Order Id to pay: ");
+                    System.out.println("Enter the Work Order Id to pay: ");
                     Integer id = Integer.parseInt(in.nextLine());
                     workOrderMap.get(id).pay(id);
                 }
 
                 case "5" -> {
-                    LOGGER.info("Enter the Work Order Id to change status: ");
+                    System.out.println("Enter the Work Order Id to change status: ");
                     Integer id = Integer.parseInt(in.nextLine());
                     workOrderMap.get(id).fix(id);
                 }
 
                 case "6" -> {
-                    LOGGER.info("Enter the Work Order Id delivered: ");
+                    System.out.println("Enter the Work Order Id delivered: ");
                     Integer id = Integer.parseInt(in.nextLine());
                     workOrderMap.get(id).setDelivered(true);
                 }
 
                 case "7" -> {
-                    LOGGER.info("Enter the Work Order Id to delete: ");
+                    System.out.println("Enter the Work Order Id to delete: ");
                     Integer id = Integer.parseInt(in.nextLine());
                     workOrderMap.remove(id);
-                    LOGGER.info("The Work Order # " + id + "is deleted");
+                    System.out.println("The Work Order # " + id + "is deleted");
                 }
 
                 case "8" -> {
+                    System.out.println("Quiting program.");
                     closeWhile = false;
-                    LOGGER.info("Quiting program.");
                 }
 
                 default -> LOGGER.info("no valid option");
@@ -98,33 +103,44 @@ public final class Menu implements ISearch {
         }
     }
 
-    public Service createService() {
-        LOGGER.info("Type of service (Software/Hardware): ");
-        String serviceStr = in.nextLine().toUpperCase();
-        ServiceType service = ServiceType.valueOf(serviceStr);
-        LOGGER.info("Service price: $");
+
+    public Service createService() throws NoServiceTypeException {
+        System.out.println("Type of service (Software/Hardware): ");
+        ServiceType service;
+        try {
+            String serviceStr = in.nextLine().toUpperCase();
+            service = ServiceType.valueOf(serviceStr);
+        } catch (Exception e) {
+            throw new NoServiceTypeException("Must provide a service type");
+        }
+        System.out.println("Service price: $");
         float servicePrice = in.nextFloat();
         Service newSer = new Service(service, servicePrice);
         return newSer;
     }
 
-    public Client addClient() {
-        LOGGER.info("Is a new client? (Y/N): ");
+    public Client addClient() throws InvalidContactException {
+        System.out.println("Is a new client? (Y/N): ");
         String answer = in.nextLine().toUpperCase();
         Client newClient = Client.compareClient(answer);
         return newClient;
     }
 
     public BusinessHour dueTo() {
-        LOGGER.info("Due to (Monday/Tuesday/Wednesday/Thursday/Friday/Saturday: ");
+        System.out.println("Due to (Monday/Tuesday/Wednesday/Thursday/Friday/Saturday: ");
         String dueStr = in.nextLine().toUpperCase();
         BusinessHour dueDate = BusinessHour.valueOf(dueStr);
         return dueDate;
     }
 
-    public Diagnosis toDiagnosis() {
-        LOGGER.info("Diagnosis: ");
-        String diangosis = in.nextLine();
+    public Diagnosis toDiagnosis() throws NoDetailException {
+        System.out.println("Diagnosis: ");
+        String diangosis;
+        try {
+            diangosis = in.nextLine();
+        } catch (Exception e) {
+            throw new NoDetailException("Must provide a detail");
+        }
         Diagnosis newDiagnosis = new Diagnosis(diangosis);
         return newDiagnosis;
     }
@@ -142,64 +158,70 @@ public final class Menu implements ISearch {
         return null;
     }
 
-    public Device createDevice() {
-        LOGGER.info("Device Info: \n Model: ");
+    public Device createDevice() throws Exception {
+        System.out.println("Device Info: \n Model: ");
         String model = in.nextLine();
-        LOGGER.info("Serial Number: #");
-        int serialNumber = Integer.parseInt(in.nextLine());
-        LOGGER.info("Type of Device (Desktop/Notebook/Tablet/Mobile): ");
+        System.out.println("Serial Number: #");
+        int serialNumber;
+        try {
+            serialNumber = Integer.parseInt(in.nextLine());
+        } catch (Exception e) {
+            throw new InvalidDeviceException("serial number not valid");
+        }
+        System.out.println("Type of Device (Desktop/Notebook/Tablet/Mobile): ");
         String typeStr = in.nextLine().toUpperCase();
         TypeOfDevice type = TypeOfDevice.valueOf(typeStr);
         Device newDevice = new Device(model, serialNumber, type);
         WorkOrderGenerator.addNewDevice(newDevice);
-        LOGGER.info(newDevice);
+        System.out.println(newDevice);
         return newDevice;
     }
 
     @Override
     public void search() {
-        LOGGER.info("Enter what do you want to search (Client/Device/WorkOrder) ");
+        System.out.println("Enter what do you want to search (Client/Device/WorkOrder) ");
         String option = in.nextLine().toLowerCase();
         switch (option) {
             case ("client") -> {
-                LOGGER.info("Enter the Client Id: ");
+                System.out.println("Enter the Client Id: ");
                 Integer id = Integer.parseInt(in.nextLine());
-                LOGGER.info(clientMap.get(id).toString());
+                System.out.println(clientMap.get(id).toString());
             }
             case ("device") -> {
-                LOGGER.info("Enter the Serial Number of the Device: ");
+                System.out.println("Enter the Serial Number of the Device: ");
                 Integer id = Integer.parseInt(in.nextLine());
-                LOGGER.info(deviceMap.get(id).toString());
+                System.out.println(deviceMap.get(id).toString());
             }
             case ("workorder") -> {
-                LOGGER.info("Enter the Work Order Id: ");
+                System.out.println("Enter the Work Order Id: ");
                 Integer id = Integer.parseInt(in.nextLine());
-                LOGGER.info(workOrderMap.get(id).toString());
+                System.out.println(workOrderMap.get(id).toString());
             }
         }
 
     }
+
     public void filterWorkOrder() {
-        LOGGER.info("\n  Enter the attribute to filter (state/ paid/ delivered): ");
+        System.out.println("\n  Enter the attribute to filter (state/ paid/ delivered): ");
         String option = in.nextLine().toLowerCase();
-        LOGGER.info("\n  Enter the  value of the attribute:  ");
+        System.out.println("\n  Enter the  value of the attribute:  ");
         boolean attribute = Boolean.parseBoolean(in.nextLine());
 
         switch (option) {
             case ("state") -> {
-                LOGGER.info("\n WorK Order Delivered Status (" + attribute + "):\n");
+                System.out.println("\n WorK Order Delivered Status (" + attribute + "):\n");
                 workOrderMap.entrySet().stream().filter((e) -> e.getValue().isDelivered() == attribute)
-                        .forEach(e -> LOGGER.info(e.getValue()));
+                        .forEach(e -> System.out.println(e.getValue()));
             }
             case ("paid") -> {
-                LOGGER.info("\n WorK Order paid Status (" + attribute + "): \n");
+                System.out.println("\n WorK Order paid Status (" + attribute + "): \n");
                 workOrderMap.entrySet().stream().filter((e) -> e.getValue().isPaid() == attribute)
-                        .forEach(e -> LOGGER.info(e.getValue()));
+                        .forEach(e -> System.out.println(e.getValue()));
             }
             case ("delivered") -> {
-                LOGGER.info("\n  WorK Order Status (" + attribute + "): \n");
+                System.out.println("\n  WorK Order Status (" + attribute + "): \n");
                 workOrderMap.entrySet().stream().filter((e) -> e.getValue().isWorkOrderState() == attribute)
-                        .forEach(e -> LOGGER.info(e.getValue()));
+                        .forEach(e -> System.out.println(e.getValue()));
             }
         }
 

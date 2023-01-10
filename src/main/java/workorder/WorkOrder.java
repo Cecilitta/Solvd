@@ -1,6 +1,8 @@
 package workorder;
 
 import device.Device;
+import exception.InvalidContactException;
+import exception.InvalidPayingMethodException;
 import person.Client;
 import person.Technician;
 import service.Service;
@@ -180,10 +182,15 @@ public class WorkOrder implements ICalculateFinalPrice, IPay, IFix {
     }
 
     @Override
-    public void pay(Integer id) {
+    public void pay(Integer id) throws InvalidPayingMethodException {
         System.out.println("Enter the paying method (CREDIT_CARD/DEBIT_CARD/PAYPAL): ");
-        String payMet = in.nextLine().toUpperCase();
-        PayingMethod payingMethod = PayingMethod.valueOf(payMet);
+        PayingMethod payingMethod;
+        try {
+            String payMet = in.nextLine().toUpperCase();
+            payingMethod = PayingMethod.valueOf(payMet);
+        } catch (Exception e){
+            throw new InvalidPayingMethodException(" Must provide a valid paying method");
+        }
         workOrderMap.get(id).calculateFinalPrice();
         workOrderMap.get(id).setPaid(true);
         System.out.println("The Work Order # " + id + "payment method is: " + payingMethod);

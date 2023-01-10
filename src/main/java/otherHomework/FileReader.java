@@ -1,10 +1,5 @@
 package otherHomework;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-
 public class FileReader {
 //    public static void main(String[] args) {
 //

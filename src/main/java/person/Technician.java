@@ -12,7 +12,7 @@ public final class Technician extends Person {
     private boolean specialist;
 
     //-------Constructor-------
-    public Technician(String contact, String name, ServiceType technicalSpecialty, boolean specialist){
+    public Technician(String contact, String name, ServiceType technicalSpecialty, boolean specialist) {
         super(contact, name);
         techCounter++;
         this.TECHNICIAN_ID = techCounter;
